@@ -1,0 +1,28 @@
+name: frontend
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  myprojectDeploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: SSH Connection
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.IP }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          script: |
+            cd /home/umang/seedlyfrntd
+            git pull origin main
+            sudo npm install
+            sudo npm run build
+            pm2 delete "Seedly Frontend" || true
+            pm2 start npm --name "Seedly Frontend" -- run dev || pm2 restart "Seedly Frontend"
